@@ -1,0 +1,221 @@
+\documentclass[addpoints,11pt,a4paper]{exam}
+\printanswers
+\usepackage{amsmath, amssymb, amsthm}
+\renewcommand{\rmdefault}{ppl} % rm
+\linespread{1.05}        % Palatino needs more leading
+\usepackage[scaled]{helvet} % ss
+\usepackage{courier} % tt
+\usepackage{eulervm} % a better implementation of the euler package (not in gwTeX)
+\normalfont
+\usepackage{caption}
+\usepackage[T1]{fontenc}
+\usepackage{mathrsfs}
+\usepackage{comment}
+\usepackage{graphicx}
+\usepackage{ulem}
+\usepackage{paralist}
+\usepackage{listings}
+\usepackage{psfrag}
+\usepackage{fullpage}
+\usepackage{fancybox}
+\usepackage{ifthen}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+\usepackage{marvosym}
+\usepackage[export]{adjustbox}
+\extrawidth{1in}
+\usepackage{multicol}
+\setlength{\columnsep}{.001cm}
+\newcommand{\twopartdef}[4]
+{
+	\left\{
+		\begin{array}{ll}
+			#1 & \mbox{if } #2 \\
+			#3 & \mbox{if } #4
+		\end{array}
+	\right.
+}
+\newcommand{\G}{\mathcal{G}}
+\newcommand{\fH}{\mathcal{H}}
+\newcommand{\M}{\mathcal{M}}
+\title{CS6730 : Assignment 3}
+\author{Instructor and TAs}
+\date{Release: 11th April 2019; {\bf Due: 18th April 2019, 11.59pm}}
+
+\begin{document}
+\maketitle
+\noindent\rule{\textwidth}{1pt}
+\begin{itemize}
+    \item Submit to {\bf GradeScope a single LaTeX-generated pdf file} containing your solutions. Please type your answers in the solutions blocks in the source LaTeX file of this assignment.
+    \item All necessary files discussed here can be found in moodle in a .zip file.
+\end{itemize}
+\noindent\rule{\textwidth}{1pt}
+
+\begin{questions}
+
+\question[10]{\sc [Dirichlet to your rescue]}
+Because of the upcoming end-semester exams, you are not able to follow up long, detailed articles from T5E (The Fifth Estate), the newsletter that provides you with regular updates of news from both IITM campus and around Chennai. You only want to have a glance at important topics and words in an article to save time. You decided to develop a bot called Dirichlet() that can summarize you the topics present in a T5E article, along with the important words in varying proportions, describing that topic. Note that Dirichlet() uses Latent Dirichlet Allocation (LDA) for topic modelling, and to do that, we need to do collapsed Gibbs sampling equations for LDA with conditional probabilities:
+
+\begin{equation}
+    \phi_{k}  \sim Dirichlet(\beta)
+\end{equation}
+\begin{equation}
+    \theta_{i}  \sim Dirichlet(\alpha)
+\end{equation}
+\begin{equation}
+    z_{ij}|\theta_{i}  \sim Discrete(\theta_{i})
+\end{equation}
+\begin{equation}
+    d_{ji}|z_{ji},\phi_{z_{ji}}  \sim Discrete(\phi_{z_{ji}})
+\end{equation}
+Here j is the index for words (\textbf{$d_{i}$ = \{$d_{1i}, ... , d_{Ni} $\}}), i is the index for documents and k is the index for topics. Also, we use the following notation: $N_{wki} = \sum_{w} N_{wki}$ and $N_{wk} = \sum_{i} N_{wki}$. We use superscript (-ji)  (e.g. $N_{wki}^{-ji}$) to indicate the corresponding word  $d_{ji}$ in document i is not counted in $N_{wki}$.
+
+\begin{parts}
+\part[1.5]  Write down P($d|z$,$\beta$) and P(z$| \alpha$) using their conditional probabilities. (Hint: Integrate out $\phi$ and $\theta$, respectively)
+%\begin{solution}
+%\end{solution}
+\part[1]  Exact probabilistic inference on p($z|d$) is infeasible. Explain the reason why the exact inference is infeasible.
+%\begin{solution}
+%\end{solution}
+\part[5] Since exact inference is infeasible, we will use approximate inference. In particular, in this problem, we are interested in collapsed Gibbs sampling (It is called collapsed Gibbs
+sampling since $\phi$ and $\theta$ are integrated out in the inference procedure). Prove the following LDA collapsed Gibbs sampling equation:
+\begin{equation*}
+    p(z_{ji} = k | z/z_{j},d,\alpha,\beta ) \propto  (N_{ki}^{(-ji)} + \alpha_{k} ) \frac{ N_{wk}^{(-ji)} + \beta_{w}}{ N_{k}^{(-ji)} + \sum_{w}\beta_{w}}
+\end{equation*}
+
+where w = $d_{ji}$.\\
+(Hint : $\Gamma(x+1) = x\Gamma(x)$)
+%\begin{solution}
+%\end{solution}
+\part[2.5] Note that $\theta_{i}$ (document-topic proportion) and $\phi_{k}$ (topic-word distribution) can be represented by using only $z_{ji}$ (topic assignment for each word $d_{ji}$  in document i ).
+Let $\Tilde{z}$ $\in \{1,...,K\}$   be a new topic assignment drawn from  p($\Tilde{z} | \{z_{ji}\}_{j=1}^{N_{i}},\alpha $). Write down $\theta_{ik} :=  $ p($\Tilde{z} =k | \{z_{ji}\}_{j=1}^{N_{i}},\alpha $). Similarly, $\Tilde{w}  $ be a token drawn from p($\Tilde{w} | \Tilde{z}, \{z_{ji},w_{ji}\}_{j=1}^{N_{i}},\beta $), write down $\phi_{kw}$  = p($\Tilde{w} | \Tilde{z}, \{z_{ji},w_{ji}\}_{j=1}^{N_{i}},\beta $), write down $\phi_{kw}$  := p($\Tilde{w}=w | \Tilde{z}=z, \{z_{ji},w_{ji}\}_{j=1}^{N_{i}},\beta $) where w indexes the vocabulary. Together $\theta_{ik}$ and $\phi_{kw}$ fully specify the generative process described earlier. You don't need to show the derivation, but you are welcome to check out the Wikipedia page on Dirichlet-multinomial distribution and give it a shot.
+%\begin{solution}
+%\end{solution}
+\end{parts}
+
+\question[20]{\sc [Dirichlet in action!]}
+Particularly, Dirichlet() has downloaded some important articles (documents) from T5E, and stored them in a file "iitm\_train\_tiny.csv". First line of this file has "body\_text", following which, there will be a number of lines. Each of the following lines will contain one document. Dirichlet() makes use of the documents to train itself. It first performs a \textbf{preprocessing step}, details of which can be found at the end of this PDF. Some of the preprocessed words can be like:
+\begin{lstlisting}
+ Showing first 5 words of preprocessed document.....
+
+ Document 1:
+institute sport secretary soapbox hold
+
+ Document 2:
+groundwater level chennai go average
+
+\end{lstlisting}
+
+Dirichlet() creates a model object using a bag of words corpus. The output of the model learned using "iitm\_train\_tiny.csv" (and fixing number of latent topics =2) should be as follows:
+\begin{lstlisting} 
+    Topics found:
+    Topic: 0 Word: 0.011*"institute" + 0.010*"sport" + 0.009*"believe" + 
+    0.009*"vijaya" + 0.009*"bhaskar" + 0.008*"soapbox" + 0.008*"facilities" + 
+    0.008*"candidates" + 0.008*"right" + 0.007*"practice"
+    Topic: 1 Word: 0.012*"level" + 0.012*"meter" + 0.011*"groundwater" + 
+    0.009*"go" + 0.009*"nagar" + 0.009*"average" + 0.009*"place" + 
+    0.008*"triplicane" + 0.008*"july" + 0.008*"chennai"
+\end{lstlisting}
+As observed, the first topic reflects "sports", which consists of words like "institute", "sport" with varying weightage, possibly indicating that the article is about soapbox for institute elections, for post of sports-sec. The second topic is about "water", possibly indicating an article about the ongoing water scarcity.
+
+Now, given a test file "iitm\_test\_tiny.csv" in the same format as the train file, Dirichlet() has to classify the documents present there, and summarize them to you. For, example, "iitm\_test\_tiny.csv" has two documents, and the output of Dirichlet() on them is expected to be as follows:
+\begin{lstlisting}
+ Testing the documents.....
+
+Scores for document 1:
+Score: 0.979525625706	 Topic: 0.011*"institute" + 0.010*"sport" +
+0.009*"believe" + 0.009*"vijaya" + 0.009*"bhaskar"
+Score: 0.0204743854702	 Topic: 0.012*"level" + 0.012*"meter" +
+0.011*"groundwater" + 0.009*"go" + 0.009*"nagar"
+
+Scores for document 2:
+Score: 0.792369842529	 Topic: 0.012*"level" + 0.012*"meter" +
+0.011*"groundwater" + 0.009*"go" + 0.009*"nagar"
+Score: 0.207630231977	 Topic: 0.011*"institute" + 0.010*"sport" +
+0.009*"believe" + 0.009*"vijaya" + 0.009*"bhaskar"
+\end{lstlisting}
+The first document is on "sports", and hence gets a higher score for the first topic, while the second documents gets a higher score for the topic "water". During testing, you may only print the top 5 words for each topic (eg. we did not print the words from "soapbox", and "average" onwards for the first and second topics respectively).
+
+Now, it's time to put Dirichlet() to some real use, and help you out. "iitm\_train\_tiny.csv" and \\"iitm\_test\_tiny.csv" were used to illustrate the problem to you, and the expected forms of outputs. You can find a larger version: "iitm\_train.csv". Train Dirichlet() on it and do the following (for all parts follow the output forms discussed earlier):
+\begin{parts}
+\part[2]  Report the topics (along with constituting words) found using "iitm\_train.csv". Keep number of topics=2 for your implementation.
+%\begin{solution}
+  %\begin{lstlisting}
+  %Put your output here.
+  %\end{lstlisting}
+%\end{solution}
+\part[4] Use the model learned by Dirichlet() to classify the documents given in "iitm\_test.csv", and report the output (for number of topics=2). You may report only top 5 words for each topic.
+%\begin{solution}
+  %\begin{lstlisting}
+  %Put your output here.
+  %\end{lstlisting}
+%\end{solution}
+\part[4] Now, go through the test documents in "iitm\_test.csv". Have a qualitative overview of the content therein and the topics present. What do you interpret of the quantitative results? Explain briefly.
+%\begin{solution}
+%\end{solution}
+\part[2]  Report the topics (along with constituting words) found using "iitm\_train.csv". Keep number of topics=7 for your implementation.
+%\begin{solution}
+  %\begin{lstlisting}
+  %Put your output here.
+  %\end{lstlisting}
+%\end{solution}
+\part[4] Use the model learned by Dirichlet() to classify the documents given in "iitm\_test.csv", and report the output (for number of topics=7). You may report only top 5 words for each topic.
+%\begin{solution}
+  %\begin{lstlisting}
+  %Put your output here.
+  %\end{lstlisting}
+%\end{solution}
+\part[4] What difference did you find when number of topics was changed to 7? And why? Explain briefly.
+%\begin{solution}
+%\end{solution}
+\end{parts}
+
+\question[10]{\sc [Dirichlet again!]}
+Well, now that Dirichlet() is able to keep you updated with news from around insti, can it help you out with staying updated with news headlines from around the world? Let's put Dirichlet() to some bigger test! Train your bot on the larger "worldnews\_train.csv", and do similar tasks:
+\begin{parts}
+\part[4]  Report the topics (along with constituting words) found using "worldnews\_train.csv". Keep number of topics=5 for your implementation.
+%\begin{solution}
+  %\begin{lstlisting}
+  %Put your output here.
+  %\end{lstlisting}
+%\end{solution}
+\part[4] Use the model learned by Dirichlet() to classify the documents given in "worldnews\_test.csv", and report the output (for number of topics=5).  You may report only top 5 words for each topic.
+%\begin{solution}
+  %\begin{lstlisting}
+  %Put your output here.
+  %\end{lstlisting}
+%\end{solution}
+\part[2] Want to explain something?
+%\begin{solution}
+%\end{solution}
+\end{parts}
+
+\question[10]{\sc [Unveil Dirichlet!]}
+Dirichlet() being so handy could be of use to us as well. Please provide its source code here, so that we can understand its working in details. Dirichlet() is available as part of standard libraries in popular languages, which we are not interested in! We expect it to be a self implemented code, not plagiarised from the web. Also, make sure to get it well-documented (else we won't evaluate your code), so that the evaluators may understand the same without hassle.
+%\begin{solution}
+  %\begin{lstlisting}
+  %Put your code here.
+  %\end{lstlisting}
+%\end{solution}
+
+\end{parts}
+
+\end{questions}
+
+\textbf{Steps of preprocessing:}
+\begin{enumerate}
+    \item \textbf{Tokenization}: i) Split the text into sentences and the sentences into words. ii) Lowercase the words, and iii) Remove punctuation.
+    \item Remove all \textbf{stopwords}.
+    \item Remove all words that have fewer than 3 characters.
+    \item \textbf{Lemmatize} the document (words in third person are changed to first person, and verbs in past and future tenses are changed into present).
+\end{enumerate}
+
+\textbf{NOTE:}
+Conventional topic models like LDA suffer from a severe sparsity problem when facing extremely short texts such as social media  posts (tweets for eg.). The family of Dirichlet multinomial mixture (DMM) can handle the sparsity problem. However, they are still very sensitive to ordinary and noisy words, resulting in inaccurate topic representations at the document level. You can refer to the recent AAAI 2019 paper (if you are interested in learning more about topic modelling): Dirichlet Multinomial Mixture with Variational Manifold Regularization: Topic Modeling over Short Texts, by Li et. al.
+
+\end{document}
